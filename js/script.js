@@ -40,6 +40,15 @@ function initMobileMenu() {
   navToggle.dataset.bound = "true";
 }
 
+function closeMobileMenu() {
+  const navToggle = document.querySelector(".nav-toggle");
+  const nav = document.querySelector("#nav");
+  if (!navToggle || !nav) return;
+
+  nav.classList.remove("open");
+  navToggle.setAttribute("aria-expanded", "false");
+}
+
 function runCounter(el) {
   const target = Number(el.dataset.count);
   const steps = 60;
@@ -53,7 +62,12 @@ function runCounter(el) {
 
 function initCounters() {
   const counters = document.querySelectorAll("[data-count]");
-  if (!counters.length) return;
+  if (!counters.length || !("IntersectionObserver" in window)) {
+    counters.forEach((el) => {
+      el.textContent = Number(el.dataset.count).toLocaleString();
+    });
+    return;
+  }
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
@@ -75,6 +89,7 @@ function initDonateForm() {
   const customInput = document.querySelector("#custom");
   const summary = document.querySelector("#summary");
   const programSelect = document.querySelector("#program");
+  if (!customInput || !summary || !programSelect) return;
   let amount = 0;
 
   function updateSummary() {
@@ -130,13 +145,14 @@ function initDonateForm() {
 function initContactForm() {
   const contactForm = document.querySelector("#contact-form");
   if (!contactForm) return;
+  const name = document.querySelector("#c-name");
+  const email = document.querySelector("#c-email");
+  const message = document.querySelector("#c-message");
+  const success = document.querySelector("#contact-success");
+  if (!name || !email || !message || !success) return;
 
   contactForm.onsubmit = (event) => {
     event.preventDefault();
-    const name = document.querySelector("#c-name");
-    const email = document.querySelector("#c-email");
-    const message = document.querySelector("#c-message");
-
     const nameOk = setError(name, name.value.trim() ? "" : "Enter your name.");
     const emailOk = setError(email, isEmail(email.value.trim()) ? "" : "Enter a valid email address.");
     const msgOk = setError(message, message.value.trim().length >= 10 ? "" : "Write at least 10 characters.");
@@ -144,59 +160,98 @@ function initContactForm() {
     if (!(nameOk && emailOk && msgOk)) return;
 
     contactForm.hidden = true;
-    document.querySelector("#contact-success").hidden = false;
+    success.hidden = false;
   };
 }
 
-function loadPage(url) {
+let pageLoadController;
+let pageLoadId = 0;
+let pageTransitionAnimation;
+
+async function loadPage(url, { historyMode = "push", scroll = true } = {}) {
   const targetUrl = new URL(url, window.location.href);
   if (targetUrl.origin !== window.location.origin) return;
 
-  const currentMain = document.querySelector("main");
-  if (!currentMain) return;
+  pageLoadController?.abort();
+  pageTransitionAnimation?.cancel();
+  pageTransitionAnimation = null;
+  pageLoadController = new AbortController();
+  const controller = pageLoadController;
+  const currentLoadId = ++pageLoadId;
 
-  currentMain.classList.add("page-leave");
+  try {
+    const response = await fetch(targetUrl.href, { signal: controller.signal });
+    if (!response.ok) throw new Error(`Page request failed (${response.status})`);
 
-  fetch(targetUrl.href)
-    .then((response) => {
-      if (!response.ok) throw new Error("Network response was not ok");
-      return response.text();
-    })
-    .then((html) => {
-      const tempDoc = document.implementation.createHTMLDocument("");
-      tempDoc.documentElement.innerHTML = html;
-      const nextMain = tempDoc.querySelector("main");
-      if (!nextMain) throw new Error("No main content found");
+    const html = await response.text();
+    const nextDocument = new DOMParser().parseFromString(html, "text/html");
+    const nextMain = nextDocument.querySelector("main");
+    if (!nextMain) throw new Error("The requested page does not contain a main element.");
 
-      const nextTitle = tempDoc.title || "Hopebridge Foundation";
-      document.title = nextTitle;
+    if (currentLoadId !== pageLoadId) return;
 
-      const metaDescription = tempDoc.querySelector('meta[name="description"]');
-      let currentMeta = document.querySelector('meta[name="description"]');
-      if (!currentMeta) {
-        currentMeta = document.createElement("meta");
-        currentMeta.setAttribute("name", "description");
-        document.head.appendChild(currentMeta);
+    const currentMain = document.querySelector("main");
+    if (!currentMain) throw new Error("The current page does not contain a main element.");
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduceMotion && currentMain.animate) {
+      pageTransitionAnimation = currentMain.animate(
+        [
+          { opacity: 1, transform: "translateY(0)" },
+          { opacity: 0, transform: "translateY(-8px)" }
+        ],
+        { duration: 140, easing: "ease-in", fill: "forwards" }
+      );
+      await pageTransitionAnimation.finished;
+      pageTransitionAnimation = null;
+    }
+
+    if (currentLoadId !== pageLoadId) return;
+
+    currentMain.replaceWith(nextMain);
+    document.title = nextDocument.title || "Hopebridge Foundation";
+
+    const nextDescription = nextDocument.querySelector('meta[name="description"]');
+    let currentDescription = document.querySelector('meta[name="description"]');
+    if (nextDescription) {
+      if (!currentDescription) {
+        currentDescription = document.createElement("meta");
+        currentDescription.name = "description";
+        document.head.appendChild(currentDescription);
       }
-      if (metaDescription) currentMeta.setAttribute("content", metaDescription.getAttribute("content") || "");
+      currentDescription.content = nextDescription.content;
+    }
 
-      const parent = currentMain.parentNode;
-      parent.insertBefore(nextMain, currentMain.nextSibling);
-      nextMain.classList.add("page-enter");
-      currentMain.classList.add("page-leave");
-      setCurrentPageLink();
-      updateYear();
-      initPage();
-      history.pushState({ url: targetUrl.href }, "", targetUrl.href);
+    if (historyMode === "push") {
+      history.pushState({ hopebridgePage: true }, "", targetUrl.href);
+    }
+
+    closeMobileMenu();
+    setCurrentPageLink();
+    updateYear();
+    initPage();
+
+    if (scroll && targetUrl.hash) {
+      const targetId = decodeURIComponent(targetUrl.hash.slice(1));
+      document.getElementById(targetId)?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth" });
+    } else if (scroll) {
       window.scrollTo({ top: 0, behavior: "auto" });
+    }
 
-      setTimeout(() => {
-        currentMain.remove();
-      }, 220);
-    })
-    .catch(() => {
-      window.location.assign(targetUrl.href);
-    });
+    if (!reduceMotion && nextMain.animate) {
+      nextMain.animate(
+        [
+          { opacity: 0, transform: "translateY(8px)" },
+          { opacity: 1, transform: "translateY(0)" }
+        ],
+        { duration: 220, easing: "ease-out" }
+      );
+    }
+  } catch (error) {
+    if (error.name === "AbortError" || currentLoadId !== pageLoadId) return;
+    console.error("Unable to switch pages smoothly; loading the destination normally.", error);
+    window.location.assign(targetUrl.href);
+  }
 }
 
 function initPage() {
@@ -209,24 +264,29 @@ function initPage() {
 }
 
 document.addEventListener("click", (event) => {
-  const link = event.target.closest("a[href]");
+  if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+
+  const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
   if (!link) return;
+  if ((link.target && link.target !== "_self") || link.hasAttribute("download")) return;
 
-  const href = link.getAttribute("href");
-  if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || link.target === "_blank") return;
+  const url = new URL(link.href, window.location.href);
+  if (url.origin !== window.location.origin) return;
 
-  const url = new URL(href, window.location.href);
-  if (url.origin !== window.location.origin || link.pathname === window.location.pathname) return;
-
+  const sameDocument = url.pathname === window.location.pathname && url.search === window.location.search;
+  if (sameDocument) return;
   event.preventDefault();
   loadPage(url.href);
 });
 
-window.addEventListener("popstate", (event) => {
-  if (event.state && event.state.url) {
-    loadPage(event.state.url);
-  }
+window.addEventListener("popstate", () => {
+  loadPage(window.location.href, { historyMode: "none" });
 });
 
-initPage();
+history.replaceState(
+  { ...(history.state && typeof history.state === "object" ? history.state : {}), hopebridgePage: true },
+  "",
+  window.location.href
+);
 
+initPage();
