@@ -2,34 +2,43 @@
    Hopebridge Foundation – shared script for all pages
    ========================================================== */
 
-// ---------- Helpers ----------
-const $ = (selector) => document.querySelector(selector);
 const isEmail = (text) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text);
 
-// Show or clear an error under a field (the error <p> has id "<fieldId>-error")
 function setError(input, message) {
   const error = document.getElementById(`${input.id}-error`);
   if (error) error.textContent = message;
   input.classList.toggle("invalid", Boolean(message));
-  return !message; // true when valid
+  return !message;
 }
 
-// ---------- 1. Footer year ----------
-const year = $("#year");
-if (year) year.textContent = new Date().getFullYear();
+function updateYear() {
+  const year = document.querySelector("#year");
+  if (year) year.textContent = new Date().getFullYear();
+}
 
-// ---------- 2. Mobile menu ----------
-const navToggle = $(".nav-toggle");
-const nav = $("#nav");
-if (navToggle && nav) {
+function setCurrentPageLink() {
+  const path = window.location.pathname.split("/").pop() || "index.html";
+  document.querySelectorAll(".nav a[href$='.html']").forEach((link) => {
+    const match = (link.getAttribute("href") || "").split("/").pop() === path;
+    if (match) {
+      link.setAttribute("aria-current", "page");
+    } else {
+      link.removeAttribute("aria-current");
+    }
+  });
+}
+
+function initMobileMenu() {
+  const navToggle = document.querySelector(".nav-toggle");
+  const nav = document.querySelector("#nav");
+  if (!navToggle || !nav || navToggle.dataset.bound === "true") return;
+
   navToggle.addEventListener("click", () => {
     const open = nav.classList.toggle("open");
     navToggle.setAttribute("aria-expanded", open);
   });
+  navToggle.dataset.bound = "true";
 }
-
-// ---------- 3. Impact numbers count up (home page) ----------
-const counters = document.querySelectorAll("[data-count]");
 
 function runCounter(el) {
   const target = Number(el.dataset.count);
@@ -42,7 +51,10 @@ function runCounter(el) {
   }, 20);
 }
 
-if (counters.length) {
+function initCounters() {
+  const counters = document.querySelectorAll("[data-count]");
+  if (!counters.length) return;
+
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -50,21 +62,21 @@ if (counters.length) {
         observer.unobserve(entry.target);
       }
     });
-  });
+  }, { threshold: 0.25 });
+
   counters.forEach((el) => observer.observe(el));
 }
 
-// ---------- 4. Donate page ----------
-const donateForm = $("#donate-form");
+function initDonateForm() {
+  const donateForm = document.querySelector("#donate-form");
+  if (!donateForm) return;
 
-if (donateForm) {
   const amountButtons = document.querySelectorAll(".amount");
-  const customInput = $("#custom");
-  const summary = $("#summary");
-  const programSelect = $("#program");
+  const customInput = document.querySelector("#custom");
+  const summary = document.querySelector("#summary");
+  const programSelect = document.querySelector("#program");
   let amount = 0;
 
-  // Text like "Your gift: $25 one-time to Education"
   function updateSummary() {
     const freq = donateForm.querySelector('input[name="freq"]:checked').value;
     summary.textContent = amount > 0
@@ -72,37 +84,33 @@ if (donateForm) {
       : "Choose an amount to continue.";
   }
 
-  // Preset amount buttons
   amountButtons.forEach((btn) => {
-    btn.addEventListener("click", () => {
-      amountButtons.forEach((b) => b.setAttribute("aria-pressed", b === btn));
+    btn.onclick = () => {
+      amountButtons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
       amount = Number(btn.dataset.amount);
       customInput.value = "";
       setError(customInput, "");
       updateSummary();
-    });
+    };
   });
 
-  // Custom amount
-  customInput.addEventListener("input", () => {
+  customInput.oninput = () => {
     amountButtons.forEach((b) => b.setAttribute("aria-pressed", "false"));
     amount = parseFloat(customInput.value) || 0;
     updateSummary();
-  });
+  };
 
-  donateForm.addEventListener("change", updateSummary);
+  donateForm.onchange = updateSummary;
 
-  // Pre-select a program from the link, e.g. donate.html?program=health
-  const wanted = new URLSearchParams(location.search).get("program");
+  const wanted = new URLSearchParams(window.location.search).get("program");
   const programNames = { education: "Education", food: "Food and nutrition", health: "Health care", water: "Clean water" };
   if (wanted && programNames[wanted]) programSelect.value = programNames[wanted];
   updateSummary();
 
-  // Submit with validation
-  donateForm.addEventListener("submit", (event) => {
+  donateForm.onsubmit = (event) => {
     event.preventDefault();
-    const name = $("#name");
-    const email = $("#email");
+    const name = document.querySelector("#name");
+    const email = document.querySelector("#email");
 
     const amountOk = amount > 0
       ? setError(customInput, "")
@@ -112,22 +120,22 @@ if (donateForm) {
 
     if (!(amountOk && nameOk && emailOk)) return;
 
-    $("#thanks-name").textContent = name.value.trim().split(" ")[0];
-    $("#thanks-detail").textContent = `${summary.textContent.replace("Your gift: ", "Your gift of ")} has been recorded. A receipt would be sent to ${email.value.trim()}.`;
+    document.querySelector("#thanks-name").textContent = name.value.trim().split(" ")[0];
+    document.querySelector("#thanks-detail").textContent = `${summary.textContent.replace("Your gift: ", "Your gift of ")} has been recorded. A receipt would be sent to ${email.value.trim()}.`;
     donateForm.hidden = true;
-    $("#donate-success").hidden = false;
-  });
+    document.querySelector("#donate-success").hidden = false;
+  };
 }
 
-// ---------- 5. Contact page ----------
-const contactForm = $("#contact-form");
+function initContactForm() {
+  const contactForm = document.querySelector("#contact-form");
+  if (!contactForm) return;
 
-if (contactForm) {
-  contactForm.addEventListener("submit", (event) => {
+  contactForm.onsubmit = (event) => {
     event.preventDefault();
-    const name = $("#c-name");
-    const email = $("#c-email");
-    const message = $("#c-message");
+    const name = document.querySelector("#c-name");
+    const email = document.querySelector("#c-email");
+    const message = document.querySelector("#c-message");
 
     const nameOk = setError(name, name.value.trim() ? "" : "Enter your name.");
     const emailOk = setError(email, isEmail(email.value.trim()) ? "" : "Enter a valid email address.");
@@ -136,29 +144,89 @@ if (contactForm) {
     if (!(nameOk && emailOk && msgOk)) return;
 
     contactForm.hidden = true;
-    $("#contact-success").hidden = false;
-  });
+    document.querySelector("#contact-success").hidden = false;
+  };
 }
 
+function loadPage(url) {
+  const targetUrl = new URL(url, window.location.href);
+  if (targetUrl.origin !== window.location.origin) return;
 
-// Fade out before following links to other pages on this site
-document.querySelectorAll("a[href]").forEach((link) => {
-  link.addEventListener("click", (event) => {
-    const url = new URL(link.href);
+  const currentMain = document.querySelector("main");
+  if (!currentMain) return;
 
-    // Skip external links, new tabs, same-page anchors and modifier keys
-    const external = url.origin !== location.origin;
-    const newTab = link.target === "_blank" || event.ctrlKey || event.metaKey;
-    const samePage = url.pathname === location.pathname && url.hash;
-    if (external || newTab || samePage) return;
+  currentMain.classList.add("page-leave");
 
-    event.preventDefault();
-    document.body.classList.add("leaving");
-    setTimeout(() => (location.href = link.href), 250);
-  });
+  fetch(targetUrl.href)
+    .then((response) => {
+      if (!response.ok) throw new Error("Network response was not ok");
+      return response.text();
+    })
+    .then((html) => {
+      const tempDoc = document.implementation.createHTMLDocument("");
+      tempDoc.documentElement.innerHTML = html;
+      const nextMain = tempDoc.querySelector("main");
+      if (!nextMain) throw new Error("No main content found");
+
+      const nextTitle = tempDoc.title || "Hopebridge Foundation";
+      document.title = nextTitle;
+
+      const metaDescription = tempDoc.querySelector('meta[name="description"]');
+      let currentMeta = document.querySelector('meta[name="description"]');
+      if (!currentMeta) {
+        currentMeta = document.createElement("meta");
+        currentMeta.setAttribute("name", "description");
+        document.head.appendChild(currentMeta);
+      }
+      if (metaDescription) currentMeta.setAttribute("content", metaDescription.getAttribute("content") || "");
+
+      const parent = currentMain.parentNode;
+      parent.insertBefore(nextMain, currentMain.nextSibling);
+      nextMain.classList.add("page-enter");
+      currentMain.classList.add("page-leave");
+      setCurrentPageLink();
+      updateYear();
+      initPage();
+      history.pushState({ url: targetUrl.href }, "", targetUrl.href);
+      window.scrollTo({ top: 0, behavior: "auto" });
+
+      setTimeout(() => {
+        currentMain.remove();
+      }, 220);
+    })
+    .catch(() => {
+      window.location.assign(targetUrl.href);
+    });
+}
+
+function initPage() {
+  updateYear();
+  setCurrentPageLink();
+  initMobileMenu();
+  initCounters();
+  initDonateForm();
+  initContactForm();
+}
+
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("a[href]");
+  if (!link) return;
+
+  const href = link.getAttribute("href");
+  if (!href || href.startsWith("#") || href.startsWith("mailto:") || href.startsWith("tel:") || link.target === "_blank") return;
+
+  const url = new URL(href, window.location.href);
+  if (url.origin !== window.location.origin || link.pathname === window.location.pathname) return;
+
+  event.preventDefault();
+  loadPage(url.href);
 });
 
-// If the user presses the Back button, remove the fade-out state
-window.addEventListener("pageshow", () => {
-  document.body.classList.remove("leaving");
+window.addEventListener("popstate", (event) => {
+  if (event.state && event.state.url) {
+    loadPage(event.state.url);
+  }
 });
+
+initPage();
+
