@@ -139,3 +139,26 @@ if (contactForm) {
     $("#contact-success").hidden = false;
   });
 }
+
+
+// Fade out before following links to other pages on this site
+document.querySelectorAll("a[href]").forEach((link) => {
+  link.addEventListener("click", (event) => {
+    const url = new URL(link.href);
+
+    // Skip external links, new tabs, same-page anchors and modifier keys
+    const external = url.origin !== location.origin;
+    const newTab = link.target === "_blank" || event.ctrlKey || event.metaKey;
+    const samePage = url.pathname === location.pathname && url.hash;
+    if (external || newTab || samePage) return;
+
+    event.preventDefault();
+    document.body.classList.add("leaving");
+    setTimeout(() => (location.href = link.href), 250);
+  });
+});
+
+// If the user presses the Back button, remove the fade-out state
+window.addEventListener("pageshow", () => {
+  document.body.classList.remove("leaving");
+});
