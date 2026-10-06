@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Contact | Hopebridge Foundation</title>
+  <meta name="description" content="Hopebridge Foundation helps children and families get education, food, health care and clean water." />
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap nav-bar">
+      <a class="brand" href="index.html"><img src="images/logo.svg" alt="" width="36" height="36" /><span>Hopebridge</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav id="nav" class="nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="programs.html">Programs</a>
+        <a href="contact.html" aria-current="page">Contact</a>
+        <a class="btn small" href="donate.html">Donate</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="wrap">
+        <h1>Contact us</h1>
+        <p class="lead">Questions, partnerships or volunteering? Send us a message and we will reply within three working days.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap two-col">
+        <div>
+          <form id="contact-form" class="form" novalidate>
+            <div class="field">
+              <label for="c-name">Your name</label>
+              <input type="text" id="c-name" autocomplete="name" />
+              <p class="error" id="c-name-error"></p>
+            </div>
+            <div class="field">
+              <label for="c-email">Email address</label>
+              <input type="email" id="c-email" autocomplete="email" />
+              <p class="error" id="c-email-error"></p>
+            </div>
+            <div class="field">
+              <label for="c-subject">Subject</label>
+              <select id="c-subject">
+                <option>General question</option>
+                <option>Volunteering</option>
+                <option>Partnership</option>
+                <option>Donation help</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="c-message">Message</label>
+              <textarea id="c-message" rows="5"></textarea>
+              <p class="error" id="c-message-error"></p>
+            </div>
+            <button class="btn" type="submit">Send message</button>
+          </form>
+          <div id="contact-success" class="success" role="status" hidden>
+            <h2>Message sent</h2>
+            <p>Thanks for reaching out. We will reply soon.</p>
+          </div>
+        </div>
+        <aside class="panel">
+          <h3>Visit or call</h3>
+          <p>12 Riverside Road<br />Sample City<br />Open Monday to Friday, 9:00 to 17:00</p>
+          <h3>Email</h3>
+          <p>hello@hopebridge.example</p>
+          <h3>Phone</h3>
+          <p>+00 123 456 789</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="footer-brand">Hopebridge Foundation</p>
+        <p>Registered charity. Every gift goes toward children's education, food, health and clean water.</p>
+      </div>
+      <div>
+        <p class="footer-title">Explore</p>
+        <a href="about.html">About us</a>
+        <a href="programs.html">Our programs</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div>
+        <p class="footer-title">Get in touch</p>
+        <p>hello@hopebridge.example<br />+00 123 456 789</p>
+      </div>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> Hopebridge Foundation. Sample website for learning.</p>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

@@ -3,12 +3,90 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My First Site</title>
-  <link rel="stylesheet" href="style.css" />
+  <title>Home | Hopebridge Foundation</title>
+  <meta name="description" content="Hopebridge Foundation helps children and families get education, food, health care and clean water." />
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button id="btn">Click me</button>
-  <script src="script.js"></script>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap nav-bar">
+      <a class="brand" href="index.html"><img src="images/logo.svg" alt="" width="36" height="36" /><span>Hopebridge</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav id="nav" class="nav" aria-label="Main">
+        <a href="index.html" aria-current="page">Home</a>
+        <a href="about.html">About</a>
+        <a href="programs.html">Programs</a>
+        <a href="contact.html">Contact</a>
+        <a class="btn small" href="donate.html">Donate</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <div class="wrap hero-inner">
+        <h1>Every child deserves a fair start.</h1>
+        <p class="lead">We work with families in rural communities to provide school places, meals, health care and clean water. Your gift turns into real change.</p>
+        <div class="btn-row">
+          <a class="btn" href="donate.html">Donate now</a>
+          <a class="btn ghost" href="programs.html">See our programs</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="stats" aria-label="Our impact">
+      <div class="wrap stat-grid">
+        <div><p class="stat-num" data-count="12500">0</p><p>children supported</p></div>
+        <div><p class="stat-num" data-count="38">0</p><p>villages reached</p></div>
+        <div><p class="stat-num" data-count="240">0</p><p>active volunteers</p></div>
+        <div><p class="stat-num" data-count="9">0</p><p>years of service</p></div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <h2>Where your support goes</h2>
+        <p class="section-intro">Four programs, one goal: healthy, educated children in strong communities.</p>
+        <div class="card-grid">
+          <article class="card"><h3>Education</h3><p>School fees, books and uniforms for children who would otherwise stay home.</p><a href="programs.html#education">Learn more</a></article>
+          <article class="card"><h3>Food and nutrition</h3><p>Daily meals at school and food parcels for families in need.</p><a href="programs.html#food">Learn more</a></article>
+          <article class="card"><h3>Health care</h3><p>Mobile clinics, vaccinations and check-ups in remote villages.</p><a href="programs.html#health">Learn more</a></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap">
+        <h2>Ready to make a difference?</h2>
+        <p>A gift of any size helps. Monthly giving helps us plan ahead.</p>
+        <a class="btn sun" href="donate.html">Give today</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="footer-brand">Hopebridge Foundation</p>
+        <p>Registered charity. Every gift goes toward children's education, food, health and clean water.</p>
+      </div>
+      <div>
+        <p class="footer-title">Explore</p>
+        <a href="about.html">About us</a>
+        <a href="programs.html">Our programs</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div>
+        <p class="footer-title">Get in touch</p>
+        <p>hello@hopebridge.example<br />+00 123 456 789</p>
+      </div>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> Hopebridge Foundation. Sample website for learning.</p>
+  </footer>
+
+  <script src="js/script.js"></script>
 </body>
 </html>

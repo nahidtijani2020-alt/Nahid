@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Donate | Hopebridge Foundation</title>
+  <meta name="description" content="Hopebridge Foundation helps children and families get education, food, health care and clean water." />
+  <link rel="icon" href="images/logo.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap nav-bar">
+      <a class="brand" href="index.html"><img src="images/logo.svg" alt="" width="36" height="36" /><span>Hopebridge</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav">Menu</button>
+      <nav id="nav" class="nav" aria-label="Main">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="programs.html">Programs</a>
+        <a href="contact.html">Contact</a>
+        <a class="btn small" href="donate.html" aria-current="page">Donate</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="page-head">
+      <div class="wrap">
+        <h1>Make a donation</h1>
+        <p class="lead">Choose an amount and a program. Monthly gifts help us plan ahead.</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap narrow">
+        <form id="donate-form" class="form" novalidate>
+          <fieldset>
+            <legend>How often?</legend>
+            <div class="choice-row">
+              <label class="choice"><input type="radio" name="freq" value="one-time" checked /> One-time</label>
+              <label class="choice"><input type="radio" name="freq" value="monthly" /> Monthly</label>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Amount</legend>
+            <div class="amounts">
+              <button type="button" class="amount" data-amount="10" aria-pressed="false">$10</button>
+              <button type="button" class="amount" data-amount="25" aria-pressed="false">$25</button>
+              <button type="button" class="amount" data-amount="50" aria-pressed="false">$50</button>
+              <button type="button" class="amount" data-amount="100" aria-pressed="false">$100</button>
+            </div>
+            <div class="field">
+              <label for="custom">Or enter another amount ($)</label>
+              <input type="number" id="custom" min="1" step="any" inputmode="decimal" placeholder="e.g. 35" />
+              <p class="error" id="custom-error"></p>
+            </div>
+          </fieldset>
+
+          <div class="field">
+            <label for="program">Where should your gift go?</label>
+            <select id="program">
+              <option value="Where it is needed most">Where it is needed most</option>
+              <option value="Education">Education</option>
+              <option value="Food and nutrition">Food and nutrition</option>
+              <option value="Health care">Health care</option>
+              <option value="Clean water">Clean water</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="name">Full name</label>
+            <input type="text" id="name" autocomplete="name" />
+            <p class="error" id="name-error"></p>
+          </div>
+          <div class="field">
+            <label for="email">Email address</label>
+            <input type="email" id="email" autocomplete="email" />
+            <p class="error" id="email-error"></p>
+          </div>
+
+          <p class="summary" id="summary" aria-live="polite">Choose an amount to continue.</p>
+          <button class="btn" type="submit">Donate</button>
+          <p class="note">This is a front-end demo. No payment is taken and no data is sent anywhere.</p>
+        </form>
+
+        <div id="donate-success" class="success" role="status" hidden>
+          <h2>Thank you, <span id="thanks-name"></span>!</h2>
+          <p id="thanks-detail"></p>
+          <a class="btn ghost" href="index.html">Back to home</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap footer-grid">
+      <div>
+        <p class="footer-brand">Hopebridge Foundation</p>
+        <p>Registered charity. Every gift goes toward children's education, food, health and clean water.</p>
+      </div>
+      <div>
+        <p class="footer-title">Explore</p>
+        <a href="about.html">About us</a>
+        <a href="programs.html">Our programs</a>
+        <a href="donate.html">Donate</a>
+        <a href="contact.html">Contact</a>
+      </div>
+      <div>
+        <p class="footer-title">Get in touch</p>
+        <p>hello@hopebridge.example<br />+00 123 456 789</p>
+      </div>
+    </div>
+    <p class="copyright">&copy; <span id="year">2026</span> Hopebridge Foundation. Sample website for learning.</p>
+  </footer>
+
+  <script src="js/script.js"></script>
+</body>
+</html>
